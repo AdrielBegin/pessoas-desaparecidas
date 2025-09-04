@@ -1,0 +1,121 @@
+# Dependências
+node_modules
+npm-debug.log*
+
+# Next.js
+/.next/
+/out/
+
+# Produção
+/build
+
+# Arquivos de ambiente
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory usado por ferramentas como istanbul
+coverage
+*.lcov
+
+# Diretório de cobertura do nyc test runner
+.nyc_output
+
+# Armazenamento temporário do ESLint
+.eslintcache
+
+# Arquivos do Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Cache REPL
+.node_repl_history
+
+# Saída de 'npm pack'
+*.tgz
+
+# Arquivo de integridade Yarn
+.yarn-integrity
+
+# Arquivo de ambiente dotenv
+.env
+
+# Arquivo de configuração parcel-bundler cache (https://parceljs.org/)
+.parcel-cache
+
+# Cache do Next.js
+.next
+
+# Saída de build do Nuxt.js
+.nuxt
+dist
+
+# Arquivos Gatsby
+.cache/
+public
+
+# Diretório de dependências do Storybook
+.storybook
+
+# Logs do Storybook
+build-storybook.log
+
+# Arquivos temporários vuepress
+.temp
+.cache
+
+# Docusaurus cache e arquivos gerados
+.docusaurus
+
+# Cache Serverless
+.serverless/
+
+# Cache FuseBox
+.fusebox/
+
+# Arquivos locais DynamoDB
+.dynamodb/
+
+# Porta TernJS
+.tern-port
+
+# Stores VSCode
+.vscode-test
+
+# Pasta yarn v2.
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# IDEs
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+
+# README
+README.md
