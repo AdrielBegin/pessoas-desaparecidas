@@ -91,8 +91,7 @@ export function EtapaAnexos({
           <div className="text-sm text-blue-800">
             <p className="font-medium mb-2">Tipos de arquivo aceitos:</p>
             <ul className="list-disc list-inside space-y-1 text-blue-700">
-              <li>Imagens: JPG, PNG, GIF (máx. 10MB cada)</li>
-              <li>Vídeos: MP4, MOV, AVI (máx. 50MB cada)</li>              
+              <li>Imagens: JPG, PNG, GIF (máx. 10MB cada)</li>              
             </ul>
           </div>
         </div>
