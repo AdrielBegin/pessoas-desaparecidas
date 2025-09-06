@@ -1,4 +1,5 @@
 import { RespostaPessoas, Estatisticas, DetalhesPessoa, EnvioInformacao, FiltrosPesquisa, Pessoa } from '@/types/pessoa/api';
+import { filtrarPorStatus, StatusPessoa } from '@/utils/statusPessoa';
 
 const API_BASE_URL = 'https://abitus-api.geia.vip';
 
@@ -38,25 +39,15 @@ class ApiService {
           message: this.getErrorMessage(response.status),
           details: errorDetails
         };
-
-        console.error('Erro na API:', {
-          endpoint,
-          status: response.status,
-          statusText: response.statusText,
-          details: errorDetails
-        });
-
         throw error;
       }
 
       return await response.json();
     } catch (error) {
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.error('Erro de conexão com a API:', endpoint);
         throw new Error('Falha na conexão com o servidor. Verifique sua internet.');
       }
 
-      console.error('Falha na requisição da API:', error);
       throw error;
     }
   }
@@ -83,8 +74,8 @@ class ApiService {
   }
 
   private async requestWithRetry<T>(
-    endpoint: string, 
-    options?: RequestInit, 
+    endpoint: string,
+    options?: RequestInit,
     maxRetries: number = 2
   ): Promise<T> {
     let lastError: unknown;
@@ -94,14 +85,13 @@ class ApiService {
         return await this.request<T>(endpoint, options);
       } catch (error: unknown) {
         lastError = error;
-        
-        if (error && typeof error === 'object' && 'status' in error && 
-            (error as { status: number }).status === 500 && attempt < maxRetries) {
-          console.log(`Tentativa ${attempt} falhou, tentando novamente em 2s...`);
+
+        if (error && typeof error === 'object' && 'status' in error &&
+          (error as { status: number }).status === 500 && attempt < maxRetries) {
           await new Promise(resolve => setTimeout(resolve, 2000));
           continue;
         }
-                
+
         throw error;
       }
     }
@@ -122,12 +112,34 @@ class ApiService {
     if (filters.sexo) params.append('sexo', filters.sexo);
     if (filters.pagina !== undefined) params.append('pagina', filters.pagina.toString());
     if (filters.porPagina !== undefined) params.append('porPagina', filters.porPagina.toString());
-    if (filters.dataLocalizacao) params.append('dataLocalizacao', filters.dataLocalizacao.toString());
+
+    if (filters.dataLocalizacao) {
+      if (filters.dataLocalizacao === 'Localizada') {
+        params.append('localizada', 'true');
+      } else if (filters.dataLocalizacao === 'Desaparecida') {
+        params.append('localizada', 'false');
+      }
+    }
 
     const queryString = params.toString();
     const endpoint = `/v1/pessoas/aberto/filtro${queryString ? `?${queryString}` : ''}`;
 
-    return this.requestWithRetry<RespostaPessoas>(endpoint);
+    const response = await this.requestWithRetry<RespostaPessoas>(endpoint);
+
+    if (filters.dataLocalizacao && response.content) {
+      const statusDesejado = filters.dataLocalizacao as StatusPessoa;
+      const pessoasFiltradas = filtrarPorStatus(response.content, statusDesejado);
+
+      return {
+        ...response,
+        content: pessoasFiltradas,
+        numberOfElements: pessoasFiltradas.length,
+        totalElements: pessoasFiltradas.length,
+        totalPages: Math.ceil(pessoasFiltradas.length / (filters.porPagina || 10))
+      };
+    }
+
+    return response;
   }
 
   async getDetalhesPessoa(id: number): Promise<DetalhesPessoa> {
@@ -149,7 +161,7 @@ class ApiService {
     formData.append('informacao', data.informacao);
     formData.append('descricao', data.descricao);
     formData.append('data', data.data);
-    
+
     if (files && files.length > 0) {
       files.forEach((file, index) => {
         formData.append('files', file);
@@ -158,7 +170,7 @@ class ApiService {
 
     return this.request<void>('/v1/ocorrencias/informacoes-desaparecido', {
       method: 'POST',
-      body: formData, 
+      body: formData,
     });
   }
 

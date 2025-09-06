@@ -40,9 +40,7 @@ export default function HomePage() {
     try {
       setLoading(true);
       const data = await apiService.getPessoas(filtros);
-      console.log('Dados das pessoas:', data);
       setPessoas(data);
-      console.log('Pessoas state atualizado:', pessoas);
     } catch (error) {
       setError(true);
       toast({

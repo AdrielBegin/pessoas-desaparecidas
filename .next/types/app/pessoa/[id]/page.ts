@@ -1,4 +1,4 @@
-// File: C:\teste-tecnico\busca-amiga-main\src\app\pessoa\[id]\page.tsx
+// File: C:\teste-tecnico\pessoa-desaparecidas\src\app\pessoa\[id]\page.tsx
 import * as entry from '../../../../../src/app/pessoa/[id]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

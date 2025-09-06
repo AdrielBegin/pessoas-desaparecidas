@@ -11,20 +11,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/informar/[id]/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/informar/[id]/page.js"
+      "static/chunks/app/page.js"
     ],
     "/pessoa/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/pessoa/[id]/page.js"
     ],
-    "/page": [
+    "/informar/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/informar/[id]/page.js"
     ]
   }
 }
