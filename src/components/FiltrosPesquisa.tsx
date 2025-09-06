@@ -14,24 +14,27 @@ interface FiltrosPesquisaProps {
 }
 
 export const FiltrosPesquisa = ({ alterarFiltros, loading }: FiltrosPesquisaProps) => {
-  const [filtros, setFiltros] = useState<FiltrosPesquisaType>({});
+  const [filtrosLocais, setFiltrosLocais] = useState<FiltrosPesquisaType>({});
 
   const handleMudarFiltro = (
     key: keyof FiltrosPesquisaType,
     value: string | number | "MASCULINO" | "FEMININO" | "Desaparecida" | "Localizada"
   ) => {
-    const novosFiltros = { ...filtros, [key]: value };
-    setFiltros(novosFiltros);
-    alterarFiltros(novosFiltros);
+    const novosFiltros = { ...filtrosLocais, [key]: value };
+    setFiltrosLocais(novosFiltros);
+  };
+
+  const aplicarFiltros = () => {
+    alterarFiltros(filtrosLocais);
   };
 
   const limparFiltro = () => {
     const filtrosLimpos = {};
-    setFiltros(filtrosLimpos);
+    setFiltrosLocais(filtrosLimpos);
     alterarFiltros(filtrosLimpos);
   };
 
-  const temFiltrosAtivos = Object.values(filtros).some(value => value !== undefined && value !== '');
+  const temFiltrosAtivos = Object.values(filtrosLocais).some(value => value !== undefined && value !== '');
 
   return (
     <Card className="mb-6">
@@ -42,14 +45,14 @@ export const FiltrosPesquisa = ({ alterarFiltros, loading }: FiltrosPesquisaProp
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="space-y-2 md:col-span-2 lg:col-span-1 xl:col-span-2">
             <label className="text-sm font-medium">Nome</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Digite o nome..."
-                value={filtros.nome || ''}
+                value={filtrosLocais.nome || ''}
                 onChange={(e) => handleMudarFiltro('nome', e.target.value)}
                 className="pl-10"
               />
@@ -59,11 +62,11 @@ export const FiltrosPesquisa = ({ alterarFiltros, loading }: FiltrosPesquisaProp
           <div className="space-y-2">
             <label className="text-sm font-medium">Sexo</label>
             <Select
-              value={filtros.sexo || ''}
+              value={filtrosLocais.sexo || ''}
               onValueChange={(value) => handleMudarFiltro('sexo', value || undefined)}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o sexo" />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="MASCULINO">Masculino</SelectItem>
@@ -75,11 +78,11 @@ export const FiltrosPesquisa = ({ alterarFiltros, loading }: FiltrosPesquisaProp
           <div className="space-y-2">
             <label className="text-sm font-medium">Status</label>
             <Select
-              value={filtros.dataLocalizacao || ''}
+              value={filtrosLocais.dataLocalizacao || ''}
               onValueChange={(value) => handleMudarFiltro('dataLocalizacao', value || undefined)}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o status" />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Desaparecida">Desaparecida</SelectItem>
@@ -89,36 +92,49 @@ export const FiltrosPesquisa = ({ alterarFiltros, loading }: FiltrosPesquisaProp
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Faixa Etária Inicial</label>
-            <Input
-              placeholder="Ex: 1"
-              value={filtros.faixaIdadeInicial || ''}
-              onChange={(e) => handleMudarFiltro('faixaIdadeInicial', e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Faixa Etária Final</label>
-            <Input
-              placeholder="Ex: 10"
-              value={filtros.faixaIdadeFinal || ''}
-              onChange={(e) => handleMudarFiltro('faixaIdadeFinal', e.target.value)}
-            />
+            <label className="text-sm font-medium">Faixa Etária</label>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                placeholder="Inicial"
+                value={filtrosLocais.faixaIdadeInicial || ''}
+                onChange={(e) => handleMudarFiltro('faixaIdadeInicial', e.target.value)}
+                className="w-full"
+              />
+              <Input
+                type="number"
+                placeholder="Final"
+                value={filtrosLocais.faixaIdadeFinal || ''}
+                onChange={(e) => handleMudarFiltro('faixaIdadeFinal', e.target.value)}
+                className="w-full"
+              />
+            </div>
           </div>
         </div>
 
-        {temFiltrosAtivos && (
-          <div className="flex justify-end">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2">
+          <Button
+            onClick={aplicarFiltros}
+            disabled={loading}
+            className="flex items-center gap-2 w-full sm:w-auto"
+            size="default"
+          >
+            <Search className="h-4 w-4" />
+            {loading ? 'Buscando...' : 'Buscar'}
+          </Button>
+
+          {temFiltrosAtivos && (
             <Button
               variant="outline"
-              size="sm"
+              size="default"
               onClick={limparFiltro}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <X className="h-4 w-4" />
               Limpar Filtros
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </CardContent>
     </Card>
   );
