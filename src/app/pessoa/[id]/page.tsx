@@ -1,9 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { DetalhesPessoa as DetalhesPessoaTypes } from '@/types/pessoa/api';
-import { apiService } from '@/services/pessoa/api';
+import { useDetalhesPessoa } from '@/hooks/usePessoas';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -19,40 +17,25 @@ export default function DetalhesPessoaPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [pessoas, setPessoas] = useState<DetalhesPessoaTypes | null>(null);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const id = params?.id as string;
+  const id = parseInt(params?.id as string);
+  
+  const { 
+    data: pessoas, 
+    isLoading: loading, 
+    error,
+    refetch 
+  } = useDetalhesPessoa(id);
 
-  const fetchDetalhesPessoa = async () => {
-    if (!id) return;
-
-    try {
-      setLoading(true);
-      const data = await apiService.getDetalhesPessoa(parseInt(id));
-      setPessoas(data);
-    } catch (error) {
-      setError(true);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os detalhes da pessoa.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleTentarNovamente = () => {
+    refetch();
   };
-
-  useEffect(() => {
-    fetchDetalhesPessoa();
-  }, [id]);
 
   if (!loading && error) {
     return (
       <ErrorState
         titulo="Erro ao carregar dados"
         mensagem="Não foi possível carregar as informações. Tente novamente."
-        tentarNovamente={fetchDetalhesPessoa}
+        tentarNovamente={handleTentarNovamente}
         mostrarRepetir={true}
       />
     );

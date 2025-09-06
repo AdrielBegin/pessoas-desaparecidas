@@ -1,12 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { apiService } from '@/services/pessoa/api';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { DetalhesPessoa as DetelhasPessoaTypes } from '@/types/pessoa/api';
+import { useDetalhesPessoa } from '@/hooks/usePessoas';
 import { ResumoInformacoesPessoa } from '@/components/informar/ResumoInformacoesPessoa';
 import { FormularioEnvioInformacoes } from '@/components/informar/FormularioEnvioInformacoes';
 import Image from 'next/image';
@@ -15,32 +13,21 @@ export default function SubmitInformationPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const id = params?.id as string;
+  const id = parseInt(params?.id as string);
 
-  const [pessoa, setPessoa] = useState<DetelhasPessoaTypes | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { 
+    data: pessoa, 
+    isLoading: loading, 
+    error 
+  } = useDetalhesPessoa(id);
 
-  useEffect(() => {
-    const fetchPersonDetails = async () => {
-      if (!id) return;
-
-      try {
-        setLoading(true);
-        const data = await apiService.getDetalhesPessoa(parseInt(id));
-        setPessoa(data);
-      } catch (error) {
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar os detalhes da pessoa.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPersonDetails();
-  }, [id, toast]);
+  if (error) {
+    toast({
+      title: "Erro",
+      description: "Não foi possível carregar os detalhes da pessoa.",
+      variant: "destructive",
+    });
+  }
 
 
 
@@ -107,7 +94,7 @@ export default function SubmitInformationPage() {
           </div>
 
           <div className="lg:col-span-2">
-            <FormularioEnvioInformacoes pessoa={pessoa} id={id} />
+            <FormularioEnvioInformacoes pessoa={pessoa} id={id.toString()} />
           </div>
         </div>
       </div>

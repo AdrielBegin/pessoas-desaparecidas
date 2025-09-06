@@ -2,8 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['abitus-api.geia.vip'],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'abitus-api.geia.vip',
+      },
       {
         protocol: 'https',
         hostname: '**',

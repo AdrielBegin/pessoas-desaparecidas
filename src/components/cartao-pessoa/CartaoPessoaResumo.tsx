@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface CartaoPessoaResumoProps {
   pessoa: Pessoa;
@@ -17,11 +18,18 @@ export const CartaoPessoaResumo = ({ pessoa, onExpandir, expandido }: CartaoPess
   return (
     <div className="relative">
       {pessoa.urlFoto ? (
-        <img
-          src={pessoa.urlFoto}
-          alt={`Foto de ${pessoa.nome}`}
-          className="w-full h-48 object-cover rounded-t-lg"
-        />
+        <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
+          <Image
+            src={pessoa.urlFoto}
+            alt={`Foto de ${pessoa.nome}`}
+            fill
+            className="object-cover"
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Kcp"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
       ) : (
         <div className="w-full h-48 bg-muted rounded-t-lg flex items-center justify-center">
           <User className="h-16 w-16 text-muted-foreground" />

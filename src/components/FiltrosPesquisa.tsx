@@ -10,11 +10,11 @@ import { Search, Filter, X } from 'lucide-react';
 
 interface FiltrosPesquisaProps {
   alterarFiltros: (filters: FiltrosPesquisaType) => void;
-  loading?: boolean;
 }
 
-export const FiltrosPesquisa = ({ alterarFiltros, loading }: FiltrosPesquisaProps) => {
+export const FiltrosPesquisa = ({ alterarFiltros }: FiltrosPesquisaProps) => {
   const [filtrosLocais, setFiltrosLocais] = useState<FiltrosPesquisaType>({});
+  const [loading, setLoading] = useState(false);
 
   const handleMudarFiltro = (
     key: keyof FiltrosPesquisaType,
@@ -25,7 +25,9 @@ export const FiltrosPesquisa = ({ alterarFiltros, loading }: FiltrosPesquisaProp
   };
 
   const aplicarFiltros = () => {
+    setLoading(true); 
     alterarFiltros(filtrosLocais);
+    setLoading(false);
   };
 
   const limparFiltro = () => {

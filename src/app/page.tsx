@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { RespostaPessoas, FiltrosPesquisa as SearchFiltersType, Estatisticas } from '@/types/pessoa/api';
-import { apiService } from '@/services/pessoa/api';
+import { FiltrosPesquisa as SearchFiltersType } from '@/types/pessoa/api';
+import { usePessoas, useEstatisticas } from '@/hooks/usePessoas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, AlertTriangle, Loader2 } from 'lucide-react';
@@ -13,63 +13,36 @@ import { FiltrosPesquisa } from '@/components/FiltrosPesquisa';
 import { CartaoPessoa } from '@/components/cartao-pessoa/CartaoPessoa';
 import { Paginacao } from '@/components/Paginacao';
 import { ErrorState } from '@/components/ErrorState';
+import { SkeletonCard, SkeletonEstatisticas } from '@/components/SkeletonCard';
 import Image from 'next/image';
 
 export default function HomePage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [pessoas, setPessoas] = useState<RespostaPessoas | null>(null);
-  const [estatisticas, setEstatisticas] = useState<Estatisticas | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [filtros, setFiltros] = useState<SearchFiltersType>({
-    pagina: 0,
-    porPagina: 10
-  });
+  const [filtros, setFiltros] = useState<SearchFiltersType>({});
+  
+  const { 
+    data: pessoas, 
+    isLoading: loadingPessoas, 
+    error: errorPessoas,
+    refetch: refetchPessoas 
+  } = usePessoas(filtros);
+  
+  const { 
+    data: estatisticas, 
+    isLoading: loadingEstatisticas 
+  } = useEstatisticas();
 
-  useEffect(() => {
-    fetchData();
-  }, [filtros]);
+  const loading = loadingPessoas || loadingEstatisticas;
+  const error = errorPessoas;
 
-  useEffect(() => {
-    fetchEstatisticas();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const data = await apiService.getPessoas(filtros);
-      setPessoas(data);
-    } catch (error) {
-      setError(true);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os dados das pessoas desaparecidas.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchEstatisticas = async () => {
-    try {
-      const data = await apiService.getEstatisticas();
-      setEstatisticas(data);
-    } catch (error) {
-      setError(true);
-      setLoading(false);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os dados estatísticos de pessoas desaparecidas.",
-        variant: "destructive",
-      });
-    }
+  const handleTentarNovamente = () => {
+    refetchPessoas();
   };
 
   const handleFiltersChange = (newFilters: SearchFiltersType) => {
-    setFiltros({ ...newFilters, pagina: 0, porPagina: 10 });
+    setFiltros(newFilters);
   };
 
   const handlePageChange = (page: number) => {
@@ -107,31 +80,28 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        {estatisticas && <EstatisticasCard estatisticas={estatisticas} />}
+        {loadingEstatisticas && <SkeletonEstatisticas />}
+        {!loadingEstatisticas && estatisticas && (
+          <EstatisticasCard estatisticas={estatisticas} />
+        )}
 
-        <FiltrosPesquisa alterarFiltros={handleFiltersChange} loading={loading} />
+        <FiltrosPesquisa alterarFiltros={handleFiltersChange} />
 
-        {!loading && error && (
+        {!loadingPessoas && errorPessoas && (
           <ErrorState
-            titulo="Erro ao carregar dados"
-            mensagem="Não foi possível carregar as informações. Tente novamente."
-            tentarNovamente={fetchData}
-            mostrarRepetir={true}
+            titulo="Erro ao carregar pessoas"
+            mensagem={errorPessoas.message || 'Ocorreu um erro inesperado'}
+            tentarNovamente={handleTentarNovamente}
           />
         )}
 
-        {loading && (
-          <Card className="p-8">
-            <CardContent className="flex items-center justify-center">
-              <div className="flex items-center gap-3">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span>Carregando informações...</span>
-              </div>
-            </CardContent>
-          </Card>
+        {loadingPessoas && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            <SkeletonCard count={8} />
+          </div>
         )}
 
-        {!loading && pessoas && (
+        {!loadingPessoas && pessoas && (
           <>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-muted-foreground">
